@@ -4,7 +4,7 @@ import datasets
 from transformers import Trainer, TrainingArguments, BertTokenizer, DataCollatorWithPadding, RobertaTokenizer, BertForSequenceClassification, RobertaForSequenceClassification
 
 class ECLAIR:
-    def __init__(self, model_name=None, tokenizer=1, task=1, type='bert'):
+    def __init__(self, model_name=None, task=1, type='bert'):
         if type == 'bert':
             self.type = 1
         else:
@@ -12,8 +12,6 @@ class ECLAIR:
         self.set_task(task)
         self.model = self.load(model_name)
         self.set_tokenizer()
-
-
 
     def set_tokenizer(self):
         if self.type == 1:
@@ -23,7 +21,12 @@ class ECLAIR:
 
     def set_task(self, t):
         self.task = t
-
+  
+    def set_type(self, ty):
+        if ty == 'bert':
+            self.type = 1
+        else:
+            self.type = 0
 
     def load(self, model_name=None):
         device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -42,11 +45,9 @@ class ECLAIR:
                     return BertForSequenceClassification.from_pretrained("bert-large-cased", num_labels=5).to(device)
                 else:
                     return BertForSequenceClassification.from_pretrained("bert-large-cased").to(device)
-
-    
+ 
     def save(self, directory='/'):
         torch.save(self.model, directory)
-
 
     def train(self, dataset, lr=2e-5, epochs=3):
         model = self.model
@@ -79,7 +80,6 @@ class ECLAIR:
 
         trainer.train()
     
-
     def dataset_prep(self, ls):
         if self.task == 1:
             ref = {'NQ': 0, 'CRCI': 1, 'CRCII': 2, 'CRCIII': 3, 'CRCIV': 4}
@@ -104,8 +104,7 @@ class ECLAIR:
         eval = datasets.Dataset.from_dict({'text': etx, 'label': elb})
         dd = datasets.DatasetDict({"train": trn, "eval": eval})
         return dd
-    
-        
+         
     def extract(self, f, lb=True):
         q = f['Qualification']
         c = f['Certification']
@@ -125,7 +124,6 @@ class ECLAIR:
             r = [res, l]
             return r
     
-
     def decode(self, s): # takes in a json object as input
         res = ECLAIR.extract(self, f=s, lb=False)
         device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
