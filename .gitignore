@@ -1,3 +1,8 @@
+.idea/
+build/
+dist/
+eclair_transformer.egg-info/
+demo_output/
 venv/
 __pycache__/
 */__pycache__
