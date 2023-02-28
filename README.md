@@ -18,20 +18,20 @@ To train the model, arrange the data in the following structure:
 
 ```
 {
-	"train": \
-	[
-		CV1,
-		CV2,
-		CV3,
-		...
-	],
-	"eval": \
-	[
-		CV1,
-		CV2,
-		CV3,
-		...
-	]
+  "train": \
+  [
+  	CV1,
+  	CV2,
+  	CV3,
+	...
+  ],
+  "eval": \
+  [
+	CV1,
+	CV2,
+	CV3,
+	...
+  ]
 }
 ```
 
@@ -39,11 +39,11 @@ where each CV is the structure below (must contain the specified fields):
 
 ```
 {
-	"Qualification":"CONTENT",
-	"Certification":"CONTENT",
-	"Experience":"CONTENT",
-	"JobProfile":"CONTENT",
-	"Label":"LABEL"
+  "Qualification":"CONTENT",
+  "Certification":"CONTENT",
+  "Experience":"CONTENT",
+  "JobProfile":"CONTENT",
+  "Label":"LABEL"
 }
 ```
 
@@ -55,10 +55,10 @@ To decode, arrange a single CV in as following:
 
 ```
 {
-	"Qualification":"CONTENT",
-	"Certification":"CONTENT",
-	"Experience":"CONTENT",
-	"JobProfile":"CONTENT",
+  "Qualification":"CONTENT",
+  "Certification":"CONTENT",
+  "Experience":"CONTENT",
+  "JobProfile":"CONTENT",
 }
 ```
 
@@ -103,5 +103,46 @@ The method takes in one parameter:
 
 ```python
 ec.decode(demo_resume)
+```
+
+It is expected that for **T1** prediction the output should be something like:
+
+```
+[
+  {
+    "best_prediction": [
+      [
+        "CRCI",
+        0.2707805931568146
+      ]
+    ],
+    "predictions": {
+      "NQ": 0.14438876509666443,
+      "CRCI": 0.2707805931568146,
+      "CRCII": 0.10479626059532166,
+      "CRCIII": 0.2588427662849426,
+      "CRCIV": 0.22119157016277313
+    }
+  }
+]
+```
+
+And for **T2** prediction:
+
+```
+[
+  {
+    "best_prediction": [
+      [
+        "YES",
+        0.8009408712387085
+      ]
+    ],
+    "predictions": {
+      "NO": 0.1990591585636139,
+      "YES": 0.8009408712387085
+    }
+  }
+]
 ```
 
