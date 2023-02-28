@@ -20,17 +20,17 @@ To train the model, arrange the data in the following structure:
 {
   "train": \
   [
-  	CV1,
-  	CV2,
-  	CV3,
-	...
+    CV1,
+    CV2,
+    CV3,
+    ...
   ],
   "eval": \
   [
-	CV1,
-	CV2,
-	CV3,
-	...
+    CV1,
+    CV2,
+    CV3,
+    ...
   ]
 }
 ```
