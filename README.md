@@ -75,8 +75,9 @@ The constructor takes in 3 parameters:
 Call the python constructor to initiate ECLAIR as an object:
 
 ```python
-from eclair_transformer.eclair import ECLAIR
-ec = ECLAIR(model_name=None, task=1, type='bert')
+from eclair.transformer import ECLAIRTransformer
+
+ec = ECLAIRTransformer(model_path=None, task=1, model_type='bert')
 ```
 
 ## Train

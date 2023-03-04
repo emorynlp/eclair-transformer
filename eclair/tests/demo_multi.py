@@ -1,7 +1,7 @@
-from eclair_transformer.eclair import ECLAIR
+from eclair.transformer import ECLAIRTransformer
 import json
 
-helper = ECLAIR()
+helper = ECLAIRTransformer()
 demo_dataset = \
 {
     "train": [{

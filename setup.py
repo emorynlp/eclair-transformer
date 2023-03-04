@@ -6,12 +6,12 @@ with open('README.md') as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name='eclair_transformer',
+    name='eclair',
     version='1.0',
     scripts=[],
-    author='Zinc Zhao',
-    author_email='zinc.zhao@emory.edu',
-    description='Resume Parser for CRCs',
+    author='Zinc Zhao, Jinho D. Choi',
+    author_email='zinc.zhao@emory.edu, jinho.choi@emory.edu',
+    description='Confidence-level Prediction for Clinical Research Coordinators (CRCs). See the following paper for more details: https://aclanthology.org/2020.emnlp-main.679/',
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/emorynlp/eclair-transformer',
