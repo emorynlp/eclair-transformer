@@ -1,9 +1,12 @@
 .idea/
 build/
 dist/
-eclair_transformer.egg-info/
+eclair.egg-info/
 demo_output/
+scripts/
+data/
 venv/
+model/
 __pycache__/
 */__pycache__
 **/__pycache__

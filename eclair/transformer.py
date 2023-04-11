@@ -3,10 +3,10 @@ from typing import List, Dict, Tuple, Union
 import datasets
 import torch
 from datasets import DatasetDict
-from transformers import Trainer, TrainingArguments, BertTokenizer, DataCollatorWithPadding, RobertaTokenizer, BertForSequenceClassification, RobertaForSequenceClassification
+from transformers import Trainer, TrainingArguments, BertTokenizer, DataCollatorWithPadding, RobertaTokenizer, BertForSequenceClassification, RobertaForSequenceClassification, BertConfig, RobertaConfig
 
-T1 = 'T1'
-T2 = 'T2'
+T1 = 't1'
+T2 = 't2'
 T1_LABEL_LIST = ['NQ', 'CRCI', 'CRCII', 'CRCIII', 'CRCIV']
 T2_LABEL_LIST = ['NO', 'YES']
 T1_LABEL_DICT = {label: idx for idx, label in enumerate(T1_LABEL_LIST)}
@@ -39,7 +39,11 @@ class ECLAIRTransformer:
                 raise Exception('Only Bert- or RoBERTa-based encoders are supported.')
         else:
             self.model = torch.load(model_path).to(self.device)
-            encoder = self.model.config.architectures[0]
+            config = self.model.config
+            if isinstance(config, BertConfig):
+                encoder = "bert-large-cased"
+            elif isinstance(config, RobertaConfig):
+                encoder = "roberta-large"
 
         self.tokenizer = BertTokenizer.from_pretrained(encoder) if encoder.startswith('bert') else RobertaTokenizer.from_pretrained(encoder)
 
@@ -49,7 +53,7 @@ class ECLAIRTransformer:
         """
         torch.save(self.model, model_path)
 
-    def train(self, trn_data: List[Dict], dev_data: List[Dict], lr: float = 2e-5, epochs: int = 3, output_dir: str = '.'):
+    def train(self, trn_data: List[Dict], dev_data: List[Dict], epochs: int = None, lr: float = 2e-5, output_dir: str = '.'):
         """
         :param trn_data: the training data; a list of dictionaries where each dictionary represents a resume.
         :param dev_data: the development data; a list of dictionaries where each dictionary represents a resume.
@@ -60,6 +64,8 @@ class ECLAIRTransformer:
         dataset = self.dataset_dict(trn_data, dev_data)
         data_collator = DataCollatorWithPadding(tokenizer=self.tokenizer)
         data = dataset.map(lambda x: self.tokenizer(x['text'], truncation=True), batched=True)
+        if not epochs:
+            epochs = 3 if self.task() == T1 else 9
 
         training_args = TrainingArguments(
             output_dir=output_dir,
@@ -105,9 +111,10 @@ class ECLAIRTransformer:
         """
 
         def create(data: List[Dict[str, str]]) -> List[Tuple[str, int]]:
-            return [(self.extract(resume), ref[resume['Label']]) for resume in data]
+            return [(self.extract(resume), ref[resume[lkey]]) for resume in data]
 
         ref = self.label_dict()
+        lkey = "{}_label".format(self.task())
         trn_text, trn_label = zip(*create(trn_data))
         dev_text, dev_label = zip(*create(dev_data))
 

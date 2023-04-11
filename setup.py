@@ -1,5 +1,3 @@
-__author__ = 'Zinc Zhao'
-
 import setuptools
 
 with open('README.md') as fh:
@@ -15,11 +13,12 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/emorynlp/eclair-transformer',
-    packages=setuptools.find_packages(exclude=['tests*']),
+    packages=setuptools.find_packages(exclude=['demo', 'tests*']),
     install_requires=[
         'torch>=1.12.0',
         'transformers==4.25.1',
-        'datasets>=2.3.2'
+        'datasets>=2.3.2',
+        'openai'
     ],
     classifiers=[
         'Programming Language :: Python :: 3',
