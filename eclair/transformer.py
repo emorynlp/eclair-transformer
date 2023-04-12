@@ -8,7 +8,7 @@ from transformers import Trainer, TrainingArguments, BertTokenizer, DataCollator
 T1 = 't1'
 T2 = 't2'
 T1_LABEL_LIST = ['NQ', 'CRCI', 'CRCII', 'CRCIII', 'CRCIV']
-T2_LABEL_LIST = ['NO', 'YES']
+T2_LABEL_LIST = ['No', 'Yes']
 T1_LABEL_DICT = {label: idx for idx, label in enumerate(T1_LABEL_LIST)}
 T2_LABEL_DICT = {label: idx for idx, label in enumerate(T2_LABEL_LIST)}
 
@@ -136,7 +136,7 @@ class ECLAIRTransformer:
             return ' '.join(s.split())
 
         res = [preprocess(resume[key]) for key in ['Qualification', 'Certification', 'Experience', 'JobProfile']]
-        if self.task() == T2: res.append(preprocess(resume['JobDescription']))
+        if self.task() == T2: res.append(preprocess(resume['job_description']))
         return ' '.join(res)
 
     def task(self) -> str:

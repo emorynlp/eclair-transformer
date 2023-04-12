@@ -37,21 +37,27 @@ def train(input_dir: str, trn_splits: str, dev_splits: str, task: str, encoder: 
 
 
 def decode(input_dir: str, tst_splits: str, task: str, model_path: str):
+    count = 0
+    correct = 0
     transformer = ECLAIRTransformer(model_path=model_path)
     for resume in read_data(input_dir, tst_splits, task):
         res = transformer.decode(resume)
         print(os.path.basename(model_path), res)
+        if res["best"][0] == resume["t2_label"]:
+            correct += 1
+        count += 1
+    print(correct, count)
 
 
 if __name__ == '__main__':
     res_dir = "resources/splits_ref/"
     input_dir = "data/unanonymized"
-    task = "t1"
+    task = T2
     trn_split_file = res_dir + "{}-trn.json".format(task)
     dev_split_file = res_dir + "{}-dev.json".format(task)
     tst_split_file = res_dir + "{}-tst.json".format(task)
-    encoder = 'roberta-large' if task == "t1" else 'bert-large-cased'
+    encoder = 'roberta-large' if task == T1 else 'bert-large-cased'
     output_dir = 'test-model'
 
-    model_path = train(input_dir, trn_split_file, dev_split_file, T1, encoder, output_dir)
-    decode(input_dir, tst_split_file, T1, model_path)
+    model_path = train(input_dir, trn_split_file, dev_split_file, T2, encoder, output_dir)
+    decode(input_dir, tst_split_file, T2, model_path)
