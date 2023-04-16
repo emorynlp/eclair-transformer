@@ -1,4 +1,4 @@
-# eclair_transformer
+# eclair-transformer
 
 ## Installation
 
@@ -10,100 +10,133 @@ pip install .
 
 ## Dataset Arrangement
 
-For a dataset example please refer to `tests/demo_multi.py` for **T1** and `tests/demo_binary.py` for **T2**.
-
 ### train
 
 To train the model, arrange the data in the following structure:
 
-```
+```json
 {
-  "train": \
-  [
-    CV1,
-    CV2,
-    CV3,
-    ...
-  ],
-  "eval": \
-  [
-    CV1,
-    CV2,
-    CV3,
-    ...
-  ]
+	"train": \
+	[
+		CV1,
+		CV2,
+		CV3,
+		...
+	],
+	"eval": \
+	[
+		CV1,
+		CV2,
+		CV3,
+		...
+	]
 }
 ```
 
 where each CV is the structure below (must contain the specified fields):
 
-```
+```json
 {
-  "Qualification":"CONTENT",
-  "Certification":"CONTENT",
-  "Experience":"CONTENT",
-  "JobProfile":"CONTENT",
-  "Label":"LABEL"
+	"Qualification":"CONTENT",
+	"Certification":"CONTENT",
+	"Experience":"CONTENT",
+	"JobProfile":"CONTENT",
+	"t1_label":"T1_LABEL", // For T1 training
+	"t2_label":"T2_LABEL", // For T2 training
+	"job_description":"JOB_DESCRIPTION_CONTENT" // For T2 training
 }
 ```
 
-For **T2** training, the `JobDescription` section is necessary.
+The recommended way of generating data in such structure is to generate each CV first in the following format with their resume ID as there name (`12345.json` for example):
+
+```json
+{
+	"Qualification":"CONTENT",
+	"Certification":"CONTENT",
+	"Experience":"CONTENT",
+	"JobProfile":"CONTENT",
+}
+```
+
+and then create a splits file in the following json format:
+
+```json
+[
+	{
+    "resume_id":12345,
+    "t1_label":"T1_LABEL", // If available
+    "t2_label": "T2_LABEL", // If available
+    "job_description": "JOB_DESCRIPTION_CONTENT" // If available
+  }
+  ...
+]
+```
+
+and merge the two fields to create resumes. For detailed implementation of data generation process as such please refer to [demo_transformer.py](https://github.com/emorynlp/eclair-transformer/blob/main/eclair/demo/demo_transformer.py)
 
 ### decode
 
 To decode, arrange a single CV in as following:
 
-```
+```json
 {
-  "Qualification":"CONTENT",
-  "Certification":"CONTENT",
-  "Experience":"CONTENT",
-  "JobProfile":"CONTENT",
+	"Qualification":"CONTENT",
+	"Certification":"CONTENT",
+	"Experience":"CONTENT",
+	"JobProfile":"CONTENT",
+	"job_description": "JOB_DESCRIPTION" // Necessary for T2 Training
 }
 ```
 
-For **T2** decoding, the `JobDescription` section is necessary.
-
 ## Initialization
 
-The constructor takes in 3 parameters:
+Eclair-transformer need either a specified (task & encoder) or a specified model to work. For training purpose, both task and encoder have to be specified. For decoding purpose, the model to be used for decoding has to be specified.
 
-* `model_name`: the name of the model loaded upon initialization as the model for the object. Default set as a `from_pretrained` model from Huggingface based on the input `type`.
-* `task`: the task to run on the object. `1` for **T1**, or multi-labeled competence level classification; `2` for **T2**, or binary-labeled acceptance prediction. (set as `1` by default)
-* `type`: the type of model to use for training (or the type of the model loaded into ECLAIR). put `'bert'` for BERT or `'roberta'` for RoBERTa. (set as `'bert'` by default)
-
-Call the python constructor to initiate ECLAIR as an object:
-
-```python
-from eclair.transformer import ECLAIRTransformer
-
-ec = ECLAIRTransformer(model_path=None, task=1, model_type='bert')
-```
+* `task`: the task to run on the object. `T1`, or `"t1"` for **T1 tasks**, or multi-labeled competence level classification; `T2`, or `"t2"` for **T2 tasks**, or binary-labeled acceptance prediction.
+* `encoder`: the type of tokenizer to use for training (or the type of the model for training or decoding). put a BERT structure tokenizer (`"bert-large-cased"`, for example) if using a BERT model or a RoBERTa structure tokenizer (`"roberta-large"`) if using a RoBERTa model.
+* `model_path`: the path to the model file loaded upon initialization as the model for the object. 
+* `output_dir`: the directory to store the checkpoint files generated during the training process.
 
 ## Train
 
-To train the model, call on the `train()` method.
+The `train()` method takes in the training data and the development data and trains the model. 
 
-The method takes in 3 parameters:
-
-* `dataset`: the dataset to be used in the training process
-* `lr`: learning rate used for training, default as `2e-5`.
-* `epochs`: epochs of training, default as `3`.
+To train the model, initialize the eclair-transformer with specified task and encoder
 
 ```python
-ec.train(demo_dataset)
+task = T1
+encoder = 'roberta-large'
+transformer = ECLAIRTransformer(task, encoder)
+```
+
+ and then call on the `train()` method
+
+```python
+trn_data = "path/to/training/data"
+dev_data = "path/to/development/data"
+model_path = os.path.join('{}-model.torch'.format(task))
+transformer.train(trn_data, dev_data)
 ```
 
 ## Decode
 
 To generate the prediction of a resume using the tool, call the `decode()` method.
 
-The method takes in one parameter:
-
-* `s`: the resume, in dictionary format, to be parsed.
+To decode a resume, initialize the eclair-transformer with specified model
 
 ```python
-ec.decode(demo_resume)
+model_path = "path/to/model"
+transformer = ECLAIRTransformer(model_path=model_path)
+```
+
+The method takes in one parameter:
+
+* `resume`: the resume, in dictionary format, to be parsed.
+
+```python
+resume = json.load(open("path/to/resume"))
+res = transformer.decode(resume)
+print(res)
 ```
 
 It is expected that for **T1** prediction the output should be something like:
