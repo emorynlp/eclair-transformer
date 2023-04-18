@@ -7,7 +7,7 @@ from typing import List, Dict
 
 MAX_LEN = 4096
 
-openai.api_key = "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"
+openai.api_key = ""
 random_names = ['Abigail Cooper', 'Samuel Davis', 'Olivia Rodriguez', 'Michael Campbell', 'Emily Watson',
          'David Parker', 'Sarah Foster', 'Christopher Ramirez', 'Madison Reed', 'William James', 
          'Jessica Hayes', 'Matthew Hernandez', 'Emma Mitchell', 'Anthony Barnes', 'Isabella Wright', 
