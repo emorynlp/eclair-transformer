@@ -63,12 +63,12 @@ and then create a splits file in the following json format:
 ```json
 [
 	{
-    "resume_id":12345,
-    "t1_label":"T1_LABEL", // If available
-    "t2_label": "T2_LABEL", // If available
-    "job_description": "JOB_DESCRIPTION_CONTENT" // If available
-  }
-  ...
+		"resume_id":12345,
+		"t1_label":"T1_LABEL", // If available
+		"t2_label": "T2_LABEL", // If available
+		"job_description": "JOB_DESCRIPTION_CONTENT" // If available
+	}
+	...
 ]
 ```
 
